@@ -10,18 +10,24 @@ a bit of functionality.
 
 ## The Problem
 
-As a race managers we want to be able to post finished race results.
+As a race managers we want to be able to post completed race results.
+
 Race results are name of the race, date, and list of drivers and number of points
 they made.
+
 As a race viewers we want to be able to get specific race results
+
 As a race viewers we want to be able to get driver or team standings
 after all completed races
 
 ### Backend
 
 Create an API for team resource
+
 Create an API for driver resource
+
 Create an API for race resource
+
 APIs should support basic filtering(e.g. by country, name and etc)
 
 Data for the drivers and teams is provided in the `data/` folder.
