@@ -19,8 +19,8 @@ races = []
 
 DRIVER_NAMES = [d['driver'] for d in drivers]
 # TEAM_NAMES = [t['team'] for t in teams]
-DRIVER_FILTER_FIELDS = ['driver', 'country', 'team']
-TEAM_FILTER_FIELDS = ['team', 'car']
+DRIVER_FILTER_FIELDS = ['id', 'driver', 'country', 'team']
+TEAM_FILTER_FIELDS = ['id', 'team', 'car']
 
 
 # time to reinvent the wheel
@@ -33,7 +33,7 @@ def filter_by_params(dict_list, params):
     """
     return [
         item for item in dict_list
-        if all(val in item[key] for key, val in params.items())
+        if all(val in str(item[key]) for key, val in params.items())
     ]
 
 
@@ -120,6 +120,7 @@ def driver_list():
         key: val for key, val in request.args.items()
         if key in DRIVER_FILTER_FIELDS
     }
+    print params
     return [driver_repr(d['id']) for d in filter_by_params(drivers, params)]
 
 
