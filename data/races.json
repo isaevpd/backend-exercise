@@ -15,4 +15,12 @@
             "Nico Rosberg": 15
         }
     },
+    {
+        "race": "my_race3",
+        "date": "2015-10-15",
+        "drivers": {
+            "Felipe Massa": 7
+        },
+        "cakes": "tasty"
+    }
 ]

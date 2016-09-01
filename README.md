@@ -73,3 +73,5 @@ All yours, have fun!
 
 PS: I have no idea of Formula1 or racing, just felt easy to propose a problem
 and find real data for the examples.
+
+## Update: added sample data to races.json for manual testing
