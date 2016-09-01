@@ -120,7 +120,6 @@ def driver_list():
         key: val for key, val in request.args.items()
         if key in DRIVER_FILTER_FIELDS
     }
-    print params
     return [driver_repr(d['id']) for d in filter_by_params(drivers, params)]
 
 
