@@ -256,8 +256,8 @@ def sort_and_enumerate(data, repr_function):
     )
     # add indices to mimic a leaderboard
     return OrderedDict(
-        (i+1, (repr_function(int(_id)), details))
-        for i, (_id, details) in enumerate(data)
+        (i+1, ({'info': repr_function(int(_id)), 'score': score}))
+        for i, (_id, score) in enumerate(data)
     )
 
 
