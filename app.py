@@ -17,7 +17,7 @@ teams = json.load(open('data/teams.json'))
 drivers = json.load(open('data/drivers.json'))
 races = []
 
-DRIVER_NAMES = [d['driver'] for d in drivers]
+# DRIVER_NAMES = [d['driver'] for d in drivers]
 # TEAM_NAMES = [t['team'] for t in teams]
 DRIVER_FILTER_FIELDS = ['id', 'driver', 'country', 'team']
 TEAM_FILTER_FIELDS = ['id', 'team', 'car']
@@ -246,8 +246,8 @@ def _driver_standings_helper():
 
 def sort_and_enumerate(data, repr_function):
     """
-    takes list of 2d tuples(driver/team, score) and reverse sorts
-    them by 2nd element, returning an enumerated OrderedDict
+    helper function that takes list of 2d tuples(driver/team, score)
+    and reverse sorts them by 2nd element, returning an enumerated OrderedDict
     """
     # sort by scores descending
     data.sort(
