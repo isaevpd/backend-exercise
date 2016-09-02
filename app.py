@@ -29,11 +29,16 @@ def filter_by_params(dict_list, params):
     simple custom filter function
     iterate over each dict in a list
     and check if item value(string) contains the value
+    or exactly matches it if its a number
     of the corresponding params data
     """
     return [
         item for item in dict_list
-        if all(val in str(item[key]) for key, val in params.items())
+        if all(
+            int(val) == item[key] if val.isdigit()
+            else val in item[key]
+            for key, val in params.items()
+        )
     ]
 
 
