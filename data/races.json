@@ -3,23 +3,24 @@
         "race": "my_race1",
         "date": "2014-3-15",
         "drivers": {
-            "Kimi Räikkönen": 5,
-            "Fernando Alonso": 7
+            "1": 5,
+            "2": 7
         }
     },
     {
         "race": "my_race2",
         "date": "2015-3-15",
         "drivers": {
-            "Kimi Räikkönen": 5,
-            "Nico Rosberg": 15
+            "1": 5,
+            "3": 15
         }
     },
     {
         "race": "my_race3",
         "date": "2015-10-15",
         "drivers": {
-            "Felipe Massa": 7
+            "7": 7,
+            "9": 15
         },
         "cakes": "tasty"
     }

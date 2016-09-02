@@ -58,6 +58,16 @@ def get_driver_names(team_id):
     ]
 
 
+def get_driver_ids(team_id):
+    """
+    returns a list of names for drivers for a given team
+    """
+    return [
+        d['id'] for d in drivers
+        if d['team'] == team_id
+    ]
+
+
 def team_repr(key):
     """
     json representation of a team
@@ -165,7 +175,7 @@ def race_list():
                 isinstance(race_data[key], _types[key]) for key in race_data):
             raise exceptions.ParseError(
                 'Invalid data, race and date have to be string/unicode,'
-                'drivers has to be a dict of the form name: score'
+                'drivers has to be a dict of the form id: score'
             )
         # parse date
         try:
@@ -182,10 +192,10 @@ def race_list():
             raise exceptions.ParseError('Please specify at least 1 driver')
         # check if all drivers actually exists and their score is an int
         if not all(
-                name in DRIVER_NAMES and isinstance(score, int)
-                for name, score in race_data['drivers'].items()):
+                int(_id) in range(1, len(drivers)+1) and isinstance(score, int)
+                for _id, score in race_data['drivers'].items()):
             raise exceptions.ParseError(
-                'Unknown driver or score is not an integer'
+                'Unknown driver id or score is not an integer'
             )
         # finally add the instance to our races list
         races.append(race_data)
@@ -215,21 +225,21 @@ def _driver_standings_helper():
     helper function to return list of
     driver standings sorted from best to worst.
     """
-    # get tuples (driver, points) for all existing races
+    # get tuples (driver_id, points) for all existing races
     driver_scores = [
-        (driver, points) for r in races
-        for driver, points in r['drivers'].items()
+        (_id, points) for r in races
+        for _id, points in r['drivers'].items()
     ]
     # intialize all scores
-    standings = {driver: 0 for driver, _ in driver_scores}
+    standings = {driver_id: 0 for driver_id, _ in driver_scores}
     # fill data in
-    for driver, points in driver_scores:
-        standings[driver] += points
+    for _id, points in driver_scores:
+        standings[_id] += points
 
     return standings.items()
 
 
-def sort_and_enumerate(data):
+def sort_and_enumerate(data, repr_function):
     """
     takes list of 2d tuples(driver/team, score) and reverse sorts
     them by 2nd element, returning an enumerated OrderedDict
@@ -240,7 +250,10 @@ def sort_and_enumerate(data):
         reverse=True
     )
     # add indices to mimic a leaderboard
-    return OrderedDict((i+1, details) for i, details in enumerate(data))
+    return OrderedDict(
+        (i+1, (repr_function(int(_id)), details))
+        for i, (_id, details) in enumerate(data)
+    )
 
 
 @app.route("/driver_standings/")
@@ -248,7 +261,7 @@ def driver_standings():
     """
     Retrieve driver standings sorted from best to worst.
     """
-    return sort_and_enumerate(_driver_standings_helper())
+    return sort_and_enumerate(_driver_standings_helper(), driver_repr)
 
 
 @app.route("/team_standings/")
@@ -263,15 +276,15 @@ def team_standings():
         # who belong to this team t
         drivers_in_race = filter(
             lambda d: d in all_drivers,
-            get_driver_names(t['id'])
+            map(str, get_driver_ids(t['id']))
         )
         # we have at least 1 such driver
         # explicit check for readability
         if drivers_in_race != []:
             # make entry team t: total score
-            standings[t['team']] = sum(all_drivers[d] for d in drivers_in_race)
+            standings[t['id']] = sum(all_drivers[d] for d in drivers_in_race)
 
-    return sort_and_enumerate(standings.items())
+    return sort_and_enumerate(standings.items(), team_repr)
 
 
 if __name__ == '__main__':
