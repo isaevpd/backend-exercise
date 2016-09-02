@@ -89,13 +89,13 @@ def team_repr(key):
 @app.route("/teams/")
 def team_list():
     """
-    List teams.
+    List teams filtered by search paramteres if applicable
     """
     params = {
         key: val for key, val in request.args.items()
         if key in TEAM_FILTER_FIELDS
     }
-    return [team_repr(d['id']) for d in filter_by_params(teams, params)]
+    return [team_repr(t['id']) for t in filter_by_params(teams, params)]
 
 
 @app.route("/teams/<int:key>/")
@@ -129,7 +129,7 @@ def driver_repr(key):
 @app.route("/drivers/")
 def driver_list():
     """
-    List drivers.
+    List drivers filtered by search paramteres if applicable
     """
     params = {
         key: val for key, val in request.args.items()
@@ -164,7 +164,7 @@ def race_repr(key):
 @app.route("/races/", methods=['GET', 'POST'])
 def race_list():
     """
-    List races.
+    List races or create a new one
     """
     if request.method == 'POST':
         # race(name), date, and dict of drivers: number of points
@@ -217,7 +217,7 @@ def race_list():
 @app.route("/races/<int:key>/")
 def race_detail(key):
     """
-    Retrieve race instances.
+    Retrieve race instance
     """
     if key not in range(1, len(races)+1):
         raise exceptions.NotFound()
@@ -247,7 +247,8 @@ def _driver_standings_helper():
 def sort_and_enumerate(data, repr_function):
     """
     helper function that takes list of 2d tuples(driver/team, score)
-    and reverse sorts them by 2nd element, returning an enumerated OrderedDict
+    and a representation function, reverse sorts the list by 2nd element,
+    returning an enumerated OrderedDict
     """
     # sort by scores descending
     data.sort(
