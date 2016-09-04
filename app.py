@@ -21,25 +21,50 @@ races = []
 # TEAM_NAMES = [t['team'] for t in teams]
 DRIVER_FILTER_FIELDS = ['id', 'driver', 'country', 'team']
 TEAM_FILTER_FIELDS = ['id', 'team', 'car']
+RACE_FILTER_FIELDS = ['race', 'date']
+
+
+# lets start with a few helper functions
+def get_date(s):
+    """
+    takes a string as an argument and returns a datetime object
+    if applicable, else None
+    """
+    try:
+        return datetime.strptime(s, '%Y-%m-%d')
+    except ValueError:
+        return None
 
 
 # time to reinvent the wheel
 def filter_by_params(dict_list, params):
     """
-    simple custom filter function
-    iterate over each dict in a list
-    and check if item value(string) contains the value
-    or exactly matches it if its a number
-    of the corresponding params data
+    simple custom filter function that iterates over each dict in a list
+    and checks if all parameters in params fit the data in a dict
     """
-    return [
-        item for item in dict_list
-        if all(
-            int(val) == item[key] if val.isdigit()
-            else val in item[key]
-            for key, val in params.items()
-        )
-    ]
+    def _filter_helper(item):
+        """
+        helper function that does an appropriate check
+        for each element in params depending on the type:
+            compare dates and ints with == operator
+            and strings with in operator
+        returns True iff all the elements in params match
+        else False
+        """
+        for key, val in params.items():
+            date = get_date(val)
+            if date is not None:
+                if date != item[key]:
+                    return False
+            elif val.isdigit():
+                if int(val) != item[key]:
+                    return False
+            else:
+                if val not in item[key]:
+                    return False
+        return True
+
+    return filter(_filter_helper, dict_list)
 
 
 # API for teams
@@ -149,7 +174,7 @@ def driver_detail(key):
 
 
 # API for races
-def race_repr(key):
+def race_repr(key, data=races):
     """
     json representation of a race
     """
@@ -157,7 +182,7 @@ def race_repr(key):
         'url': request.host_url.rstrip('/') + url_for(
             'race_detail', key=key
         ),
-        'data': races[key-1]
+        'data': data[key-1]
     }
 
 
@@ -183,11 +208,8 @@ def race_list():
                 'drivers has to be a dict of the form id: score'
             )
         # parse date
-        try:
-            race_data['date'] = datetime.strptime(
-                race_data['date'], '%Y-%m-%d'
-            )
-        except ValueError:
+        race_data['date'] = get_date(race_data['date'])
+        if race_data['date'] is None:
             raise exceptions.ParseError(
                 'Incorrect date format, should be YYYY-MM-DD'
             )
@@ -206,9 +228,16 @@ def race_list():
         races.append(race_data)
         return race_repr(len(races)), status.HTTP_201_CREATED
     # request.method == 'GET'
+    # find params that we can immediately check
+    default_params = {
+        key: val for key, val in request.args.items()
+        if key in RACE_FILTER_FIELDS
+    }
+    # filter races by name or/and date
+    races_clean = filter_by_params(races, default_params)
     # return races sorted by date from latest to earliest
     return sorted(
-        [race_repr(i) for i in range(1, len(races)+1)],
+        [race_repr(i, races_clean) for i in range(1, len(races_clean)+1)],
         key=lambda race: race['data']['date'],
         reverse=True
     )
