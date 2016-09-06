@@ -53,15 +53,20 @@ def filter_by_params(dict_list, params):
         """
         for key, val in params.items():
             date = get_date(val)
-            if date is not None:
-                if date != item[key]:
-                    return False
-            elif val.isdigit():
-                if int(val) != item[key]:
-                    return False
-            else:
-                if val not in item[key]:
-                    return False
+            try:
+                if date is not None:
+                    if date != item[key]:
+                        return False
+                elif val.isdigit():
+                    if int(val) != item[key]:
+                        return False
+                elif val.isalpha():
+                    # we got a string here
+                    if val not in item[key]:
+                        return False
+            except TypeError:
+                # inconsistent input(e.g. id=fi)
+                return False
         return True
 
     return filter(_filter_helper, dict_list)
