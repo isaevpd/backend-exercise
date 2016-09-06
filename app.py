@@ -61,7 +61,6 @@ def filter_by_params(dict_list, params):
                     if int(val) != item[key]:
                         return False
                 elif val.isalpha():
-                    # we got a string here
                     if val not in item[key]:
                         return False
             except TypeError:
